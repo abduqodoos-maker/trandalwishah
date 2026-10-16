@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Cairo', sans-serif; }
-        .category-btn.active {
+        .admin-tab-btn.active {
             background-color: #4f46e5;
             color: #ffffff;
         }
@@ -20,21 +20,21 @@
 </head>
 <body class="bg-slate-50 text-gray-800 flex flex-col min-h-screen">
 
-    <!-- شريط التنقل العلوي -->
+    <!-- شريط التنقل العلوي للمستخدم -->
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40">
         <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3 space-x-reverse cursor-pointer">
+            <div class="flex items-center space-x-3 space-x-reverse cursor-pointer" onclick="switchView('store')">
                 <span class="bg-indigo-600 text-white p-2 rounded-lg font-black text-xl"><i class="fa-solid fa-store"></i></span>
                 <h1 class="text-2xl font-black tracking-wider text-indigo-400">ترند شوب</h1>
             </div>
             <nav class="hidden md:flex space-x-6 space-x-reverse font-semibold items-center">
-                <button class="hover:text-indigo-400 transition bg-transparent border-none cursor-pointer text-white font-semibold">الرئيسية</button>
+                <button onclick="switchView('store')" class="hover:text-indigo-400 transition bg-transparent border-none cursor-pointer text-white font-semibold">الرئيسية</button>
                 <a href="https://wa.me/967771558887" target="_blank" class="hover:text-emerald-400 transition text-white font-semibold flex items-center">
                     <i class="fa-brands fa-whatsapp text-emerald-400 ml-1"></i> تواصل معنا
                 </a>
             </nav>
             <div class="flex items-center space-x-4 space-x-reverse">
-                <button class="relative bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg transition">
+                <button onclick="toggleCart()" class="relative bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg transition">
                     <i class="fa-solid fa-cart-shopping text-lg"></i>
                     <span id="cart-count" class="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">0</span>
                 </button>
@@ -44,6 +44,8 @@
 
     <!-- المحتوى الرئيسي -->
     <main class="flex-grow container mx-auto px-4 py-6">
+
+        <!-- 1. واجهة المتجر العامة -->
         <div id="store-view" class="space-y-8">
             <!-- قسم الترحيب -->
             <div class="bg-gradient-to-r from-indigo-700 to-slate-900 rounded-2xl p-8 text-white shadow-lg flex flex-col md:flex-row justify-between items-center">
@@ -53,7 +55,7 @@
                     <p class="text-slate-300 max-w-xl text-sm md:text-base">تصفح منتجاتنا المميزة واطلب مباشرة عبر الواتساب وسنصلك أينما كنت.</p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <button class="bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl shadow hover:bg-indigo-700 transition">تصفح المنتجات</button>
+                    <button onclick="document.getElementById('products-section').scrollIntoView({behavior: 'smooth'})" class="bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl shadow hover:bg-indigo-700 transition">تصفح المنتجات</button>
                     <a href="https://wa.me/967771558887" target="_blank" class="bg-emerald-600 text-white font-bold px-6 py-3 rounded-xl shadow hover:bg-emerald-700 transition flex items-center justify-center">
                         <i class="fa-brands fa-whatsapp text-xl ml-2"></i> تواصل مباشر
                     </a>
@@ -61,36 +63,622 @@
             </div>
 
             <!-- قسم المنتجات -->
-            <div id="products-section" class="space-y-6">
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl border shadow-sm">
-                    <div id="categories-container" class="flex flex-wrap gap-2 w-full md:w-auto">
-                        <button class="category-btn active px-4 py-2 rounded-xl text-sm font-bold transition">الكل</button>
-                    </div>
-                    <div class="w-full md:w-64">
-                        <input type="text" id="search-input" placeholder="ابحث عن منتج..." class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-slate-50">
+            <div id="products-section" class="space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <h3 class="text-2xl font-bold text-slate-800">المنتجات المتاحة</h3>
+                    <div class="w-full sm:w-64">
+                        <input type="text" id="search-input" oninput="filterProducts()" placeholder="ابحث عن منتج..." class="w-full px-4 py-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-white">
                     </div>
                 </div>
-
-                <!-- شبكة المنتجات المحدثة تلقائياً -->
                 <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    <!-- تم توليد منتج تجريبي للتأكد من عمل الصفحة -->
-                    <div class="bg-white rounded-2xl border shadow-sm overflow-hidden flex flex-col justify-between p-4">
-                        <div class="h-48 bg-slate-100 rounded-xl mb-4 flex items-center justify-center text-slate-400">
-                            <i class="fa-solid fa-image text-4xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="font-bold text-lg text-slate-800 mb-1">منتج تجريبي (مثال)</h3>
-                            <p class="text-indigo-600 font-black mb-3">15,000 ر.ي</p>
-                        </div>
-                        <button class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl transition text-sm">أضف للسلة</button>
-                    </div>
+                    <!-- تعبئة المنتجات تلقائياً -->
                 </div>
             </div>
         </div>
+
+        <!-- 2. نافذة تسجيل الدخول للإدارة -->
+        <div id="login-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-6">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h3 class="font-bold text-xl text-slate-800"><i class="fa-solid fa-lock text-indigo-600 ml-2"></i> تسجيل دخول مدير المتجر</h3>
+                    <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-600 text-xl bg-transparent border-none cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">اسم المستخدم</label>
+                        <input type="text" id="admin-user" required class="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">كلمة المرور</label>
+                        <input type="password" id="admin-pass" required class="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition shadow">دخول لوحة التحكم</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 3. لوحة الإدارة الاحترافية -->
+        <div id="admin-view" class="hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <div class="bg-indigo-100 text-indigo-600 p-3 rounded-xl text-2xl font-black">
+                        <i class="fa-solid fa-gauge-high"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">لوحة إدارة متجر ترند شوب</h3>
+                        <p class="text-xs text-slate-500">مرحباً بك، يمكنك التحكم بالمنتجات والطلبات وتحديث إعداداتك.</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-3 space-x-reverse">
+                    <button onclick="switchView('store')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center">
+                        <i class="fa-solid fa-store ml-1.5"></i> العودة للمتجر
+                    </button>
+                    <button onclick="logoutAdmin()" class="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center">
+                        <i class="fa-solid fa-right-from-bracket ml-1.5"></i> تسجيل الخروج
+                    </button>
+                </div>
+            </div>
+
+            <!-- بطاقات الإحصائيات -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 font-bold mb-1">إجمالي الطلبات الواردة</p>
+                        <h4 id="stat-total-orders" class="text-2xl font-black text-slate-800">0</h4>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-boxes-packing"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 font-bold mb-1">إجمالي المبيعات التقديرية</p>
+                        <h4 id="stat-total-sales" class="text-2xl font-black text-slate-800">0 ر.ي</h4>
+                    </div>
+                    <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-slate-500 font-bold mb-1">المنتجات النشطة</p>
+                        <h4 id="stat-total-products" class="text-2xl font-black text-slate-800">0</h4>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl font-bold">
+                        <i class="fa-solid fa-box-archive"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- أزرار التبويبات -->
+            <div class="flex space-x-2 space-x-reverse border-b pb-2">
+                <button onclick="switchAdminTab('orders')" id="tab-btn-orders" class="admin-tab-btn active px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center">
+                    <i class="fa-solid fa-list-check ml-2"></i> إدارة الطلبات
+                </button>
+                <button onclick="switchAdminTab('products')" id="tab-btn-products" class="admin-tab-btn bg-white hover:bg-slate-100 text-slate-600 border px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center">
+                    <i class="fa-solid fa-boxes-stacked ml-2"></i> إدارة المنتجات
+                </button>
+                <button onclick="switchAdminTab('settings')" id="tab-btn-settings" class="admin-tab-btn bg-white hover:bg-slate-100 text-slate-600 border px-5 py-2.5 rounded-xl font-bold text-xs transition flex items-center">
+                    <i class="fa-solid fa-user-gear ml-2"></i> إعدادات الأمان
+                </button>
+            </div>
+
+            <!-- تبويب الطلبات -->
+            <div id="admin-tab-orders" class="admin-tab-content bg-white p-6 rounded-2xl shadow-sm border space-y-4">
+                <div class="flex justify-between items-center border-b pb-3">
+                    <h4 class="font-bold text-base text-slate-800"><i class="fa-solid fa-receipt text-emerald-600 ml-2"></i> قائمة الطلبات الحديثة</h4>
+                    <span id="orders-badge" class="bg-emerald-100 text-emerald-700 text-xs px-3 py-1 rounded-full font-bold">0 طلبات</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-sm">
+                        <thead class="bg-slate-100 text-slate-600 rounded-lg">
+                            <tr>
+                                <th class="p-3">رقم الطلب</th>
+                                <th class="p-3">العميل</th>
+                                <th class="p-3">رقم الهاتف</th>
+                                <th class="p-3">العنوان</th>
+                                <th class="p-3">المنتجات</th>
+                                <th class="p-3">الإجمالي</th>
+                                <th class="p-3">التاريخ</th>
+                                <th class="p-3 text-center">إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-table"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- تبويب المنتجات -->
+            <div id="admin-tab-products" class="admin-tab-content hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border space-y-4">
+                        <h4 class="font-bold text-base text-slate-800 border-b pb-2"><i class="fa-solid fa-circle-plus text-indigo-600 ml-2"></i> إضافة منتج جديد</h4>
+                        <form id="add-product-form" onsubmit="addProduct(event)" class="space-y-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">اسم المنتج</label>
+                                <input type="text" id="p-name" required class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">السعر (ريال يمني)</label>
+                                <input type="number" id="p-price" required step="1" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">صورة المنتج</label>
+                                <input type="file" id="p-image-file" accept="image/*" required class="w-full px-3 py-2 border rounded-xl text-xs text-slate-500 focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 mb-1">وصف المنتج</label>
+                                <textarea id="p-desc" rows="3" class="w-full px-3 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"></textarea>
+                            </div>
+                            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-sm transition shadow">إضافة للمتجر</button>
+                        </form>
+                    </div>
+                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border space-y-4">
+                        <h4 class="font-bold text-base text-slate-800 border-b pb-2"><i class="fa-solid fa-boxes-packing text-indigo-600 ml-2"></i> المنتجات الحالية</h4>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-sm">
+                                <thead class="bg-slate-100 text-slate-600">
+                                    <tr>
+                                        <th class="p-3">المنتج</th>
+                                        <th class="p-3">السعر</th>
+                                        <th class="p-3">الوصف</th>
+                                        <th class="p-3 text-center">حذف</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-products-table"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- تبويب الإعدادات -->
+            <div id="admin-tab-settings" class="admin-tab-content hidden bg-white p-6 rounded-2xl shadow-sm border space-y-4 max-w-2xl">
+                <h4 class="font-bold text-base text-slate-800 border-b pb-2"><i class="fa-solid fa-shield-halved text-indigo-600 ml-2"></i> تعديل بيانات مدير الموقع</h4>
+                <form onsubmit="updateAdminCredentials(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">اسم المستخدم الجديد</label>
+                        <input type="text" id="new-admin-user" required class="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-600 mb-1">كلمة المرور الجديدة</label>
+                        <input type="password" id="new-admin-pass" required class="w-full px-4 py-2 border rounded-xl text-sm focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition">حفظ التغييرات</button>
+                </form>
+            </div>
+        </div>
+
     </main>
 
-    <footer class="bg-slate-900 text-slate-400 py-6 text-center border-t border-slate-800 text-sm">
-        <p>&copy; 2026 ترند شوب. جميع الحقوق محفوظة.</p>
+    <!-- نافذة سلة المشتريات -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex justify-end">
+        <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl">
+            <div class="p-4 bg-slate-900 text-white flex justify-between items-center">
+                <h3 class="font-bold text-lg"><i class="fa-solid fa-cart-shopping ml-2"></i> سلة المشتريات</h3>
+                <button onclick="toggleCart()" class="text-slate-400 hover:text-white bg-transparent border-none cursor-pointer text-xl"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="cart-items" class="flex-grow p-4 overflow-y-auto space-y-3 divide-y"></div>
+            <div id="checkout-section" class="p-4 bg-slate-50 border-t space-y-3">
+                <div class="space-y-2">
+                    <h4 class="font-bold text-xs text-slate-700">بيانات الاستلام والتوصيل:</h4>
+                    <input type="text" id="cust-name" placeholder="الاسم الكامل" class="w-full px-3 py-1.5 border rounded-lg text-xs bg-white">
+                    <input type="tel" id="cust-phone" placeholder="رقم الهاتف (مثل: 771558887)" class="w-full px-3 py-1.5 border rounded-lg text-xs bg-white">
+                    <input type="text" id="cust-address" placeholder="العنوان / المدينة - الشارع" class="w-full px-3 py-1.5 border rounded-lg text-xs bg-white">
+                </div>
+                <div class="flex justify-between font-bold text-base border-t pt-2">
+                    <span>المجموع الكلي:</span>
+                    <span id="cart-total" class="text-indigo-600">0 ر.ي</span>
+                </div>
+                <button onclick="checkout()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow flex items-center justify-center">
+                    <i class="fa-brands fa-whatsapp text-xl ml-2"></i> إتمام الطلب وإرسال عبر الواتساب
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- زر واتساب العائم -->
+    <a href="https://wa.me/967771558887" target="_blank" class="fixed bottom-6 left-6 bg-emerald-500 hover:bg-emerald-600 text-white p-4 rounded-full shadow-2xl z-40 flex items-center justify-center text-2xl transition hover:scale-110">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- تذييل الصفحة -->
+    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-sm mt-auto">
+        <p>&copy; 2026 موقع <b>ترند شوب</b> - اليمن. جميع الحقوق محفوظة.</p>
+        <p class="text-xs text-slate-500 mt-1">
+            للتواصل المباشر والطلب: 771558887 | 
+            <!-- تمت إضافة زر دخول خفي وعملي هنا في الفوتر -->
+            <button onclick="checkAdminAccess()" class="text-slate-600 hover:text-indigo-400 bg-transparent border-none cursor-pointer underline text-xs mr-2">دخول الإدارة</button>
+        </p>
     </footer>
+
+    <!-- JS -->
+    <script>
+        const WHATSAPP_NUMBER = "967771558887";
+
+        let adminUser = localStorage.getItem('trend_admin_user') || 'admin';
+        let adminPass = localStorage.getItem('trend_admin_pass') || 'admin';
+
+        let products = JSON.parse(localStorage.getItem('trend_products')) || [
+            { id: 1, name: 'ساعة ذكية عصرية', price: 25000, image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=500&q=80', desc: 'ساعة ذكية تتبع اللياقة والإشعارات.' },
+            { id: 2, name: 'سماعة بلوتوث لاسلكية', price: 15000, image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=500&q=80', desc: 'صوت نقي وبطارية تدوم طويلاً.' },
+            { id: 3, name: 'حذاء رياضي مريح', price: 30000, image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=500&q=80', desc: 'تصميم مريح للجري والمشي.' }
+        ];
+
+        let orders = JSON.parse(localStorage.getItem('trend_orders')) || [];
+        let cart = [];
+        let isAdminLoggedIn = sessionStorage.getItem('admin_logged') === 'true';
+
+        // اختصار سري لوحة المفاتيح (Ctrl + Shift + A) + النقر 5 مرات على اسم المتجر
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+                e.preventDefault();
+                checkAdminAccess();
+            }
+        });
+
+        // طريقة إضافية سهلة: النقر 5 مرات متتالية على شعار المتجر في الأعلى
+        let clickCount = 0;
+        document.querySelector('header h1').parentElement.addEventListener('click', function() {
+            clickCount++;
+            if (clickCount === 5) {
+                clickCount = 0;
+                checkAdminAccess();
+            }
+            setTimeout(() => { clickCount = 0; }, 3000);
+        });
+
+        function saveProducts() { localStorage.setItem('trend_products', JSON.stringify(products)); }
+        function saveOrders() { localStorage.setItem('trend_orders', JSON.stringify(orders)); }
+        function formatCurrency(amount) { return amount.toLocaleString('ar-YE') + ' ر.ي'; }
+
+        function switchView(view) {
+            const storeView = document.getElementById('store-view');
+            const adminView = document.getElementById('admin-view');
+
+            if (view === 'store') {
+                storeView.classList.remove('hidden');
+                adminView.classList.add('hidden');
+                renderProducts();
+            } else {
+                storeView.classList.add('hidden');
+                adminView.classList.remove('hidden');
+                document.getElementById('new-admin-user').value = adminUser;
+                document.getElementById('new-admin-pass').value = adminPass;
+                updateStats();
+                renderAdminProducts();
+                renderAdminOrders();
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-indigo-600', 'text-white');
+                btn.classList.add('bg-white', 'text-slate-600');
+            });
+
+            document.getElementById(`admin-tab-${tabName}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+            activeBtn.classList.add('active');
+            activeBtn.classList.remove('bg-white', 'text-slate-600');
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total-orders').innerText = orders.length;
+            const totalSales = orders.reduce((sum, o) => sum + o.total, 0);
+            document.getElementById('stat-total-sales').innerText = formatCurrency(totalSales);
+            document.getElementById('stat-total-products').innerText = products.length;
+        }
+
+        function checkAdminAccess() {
+            if (isAdminLoggedIn) {
+                switchView('admin');
+            } else {
+                document.getElementById('login-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+        }
+
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('admin-user').value;
+            const pass = document.getElementById('admin-pass').value;
+
+            if (user === adminUser && pass === adminPass) {
+                isAdminLoggedIn = true;
+                sessionStorage.setItem('admin_logged', 'true');
+                closeLoginModal();
+                switchView('admin');
+            } else {
+                alert('خطأ في اسم المستخدم أو كلمة المرور!');
+            }
+        }
+
+        function logoutAdmin() {
+            isAdminLoggedIn = false;
+            sessionStorage.removeItem('admin_logged');
+            switchView('store');
+        }
+
+        function updateAdminCredentials(e) {
+            e.preventDefault();
+            const newUser = document.getElementById('new-admin-user').value.trim();
+            const newPass = document.getElementById('new-admin-pass').value.trim();
+
+            if (!newUser || !newPass) {
+                alert('يرجى إدخال اسم المستخدم وكلمة المرور بشكل صحيح.');
+                return;
+            }
+
+            adminUser = newUser;
+            adminPass = newPass;
+
+            localStorage.setItem('trend_admin_user', adminUser);
+            localStorage.setItem('trend_admin_pass', adminPass);
+
+            alert('تم تحديث بيانات الدخول بنجاح!');
+        }
+
+        function renderProducts(filteredList = products) {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = '';
+
+            if (filteredList.length === 0) {
+                grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-8">لا توجد منتجات مطابقة.</p>`;
+                return;
+            }
+
+            filteredList.forEach(p => {
+                grid.innerHTML += `
+                    <div class="bg-white rounded-2xl shadow-sm border hover:shadow-md transition flex flex-col overflow-hidden">
+                        <img src="${p.image}" alt="${p.name}" class="h-48 w-full object-cover">
+                        <div class="p-4 flex flex-col flex-grow space-y-2">
+                            <h4 class="font-bold text-slate-800 text-base">${p.name}</h4>
+                            <p class="text-slate-500 text-xs flex-grow">${p.desc || ''}</p>
+                            <div class="flex justify-between items-center pt-2">
+                                <span class="text-indigo-600 font-black text-base">${formatCurrency(p.price)}</span>
+                                <button onclick="addToCart(${p.id})" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition">
+                                    <i class="fa-solid fa-cart-plus ml-1"></i> أضف للسلة
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterProducts() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filtered = products.filter(p => p.name.toLowerCase().includes(query) || (p.desc && p.desc.toLowerCase().includes(query)));
+            renderProducts(filtered);
+        }
+
+        function renderAdminProducts() {
+            const tbody = document.getElementById('admin-products-table');
+            tbody.innerHTML = '';
+
+            products.forEach(p => {
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="p-3 flex items-center space-x-3 space-x-reverse">
+                            <img src="${p.image}" class="w-10 h-10 rounded-lg object-cover">
+                            <span class="font-bold text-slate-800">${p.name}</span>
+                        </td>
+                        <td class="p-3 text-indigo-600 font-bold">${formatCurrency(p.price)}</td>
+                        <td class="p-3 text-slate-500 text-xs truncate max-w-xs">${p.desc || '-'}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteProduct(${p.id})" class="bg-red-100 hover:bg-red-200 text-red-600 p-2 rounded-lg text-xs transition"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function addProduct(e) {
+            e.preventDefault();
+            const name = document.getElementById('p-name').value;
+            const price = parseFloat(document.getElementById('p-price').value);
+            const desc = document.getElementById('p-desc').value;
+            const imageFile = document.getElementById('p-image-file').files[0];
+
+            if (!imageFile) return;
+
+            const reader = new FileReader();
+            reader.onload = function (event) {
+                const newProduct = {
+                    id: Date.now(),
+                    name,
+                    price,
+                    image: event.target.result,
+                    desc
+                };
+
+                products.push(newProduct);
+                saveProducts();
+                renderAdminProducts();
+                updateStats();
+                document.getElementById('add-product-form').reset();
+                alert('تمت إضافة المنتج بنجاح!');
+            };
+            reader.readAsDataURL(imageFile);
+        }
+
+        function deleteProduct(id) {
+            if (confirm('هل أنت متأكد من حذف هذا المنتج؟')) {
+                products = products.filter(p => p.id !== id);
+                saveProducts();
+                renderAdminProducts();
+                updateStats();
+            }
+        }
+
+        function renderAdminOrders() {
+            const tbody = document.getElementById('orders-table');
+            const badge = document.getElementById('orders-badge');
+            tbody.innerHTML = '';
+            badge.innerText = `${orders.length} طلبات`;
+
+            if (orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center text-slate-400 py-6">لا توجد طلبات واردة حتى الآن.</td></tr>`;
+                return;
+            }
+
+            orders.forEach(o => {
+                const itemsText = o.items.map(i => `${i.name} (${i.quantity})`).join(', ');
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="p-3 font-bold text-slate-700">#${o.id}</td>
+                        <td class="p-3 font-bold">${o.customerName}</td>
+                        <td class="p-3 text-indigo-600 font-bold">${o.customerPhone}</td>
+                        <td class="p-3 text-xs text-slate-600">${o.customerAddress}</td>
+                        <td class="p-3 text-xs text-slate-800">${itemsText}</td>
+                        <td class="p-3 font-black text-emerald-600">${formatCurrency(o.total)}</td>
+                        <td class="p-3 text-xs text-slate-400">${o.date}</td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteOrder(${o.id})" class="bg-red-100 hover:bg-red-200 text-red-600 p-2 rounded-lg text-xs transition"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function deleteOrder(id) {
+            if (confirm('هل تريد حذف هذا الطلب؟')) {
+                orders = orders.filter(o => o.id !== id);
+                saveOrders();
+                renderAdminOrders();
+                updateStats();
+            }
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cart-modal');
+            modal.classList.toggle('hidden');
+            renderCart();
+        }
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            const existing = cart.find(item => item.id === productId);
+
+            if (existing) {
+                existing.quantity++;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+
+            updateCartCount();
+            toggleCart();
+        }
+
+        function updateCartCount() {
+            const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cart-count').innerText = totalCount;
+        }
+
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            container.innerHTML = '';
+
+            if (cart.length === 0) {
+                container.innerHTML = `<p class="text-center text-slate-400 py-10">سلة المشتريات فارغة.</p>`;
+                document.getElementById('cart-total').innerText = '0 ر.ي';
+                return;
+            }
+
+            let total = 0;
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+                container.innerHTML += `
+                    <div class="flex justify-between items-center py-2">
+                        <div class="flex items-center space-x-3 space-x-reverse">
+                            <img src="${item.image}" class="w-12 h-12 rounded-lg object-cover">
+                            <div>
+                                <h5 class="font-bold text-sm">${item.name}</h5>
+                                <p class="text-xs text-indigo-600">${formatCurrency(item.price)} × ${item.quantity}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 space-x-reverse">
+                            <button onclick="changeQty(${item.id}, 1)" class="bg-slate-100 px-2 py-1 rounded text-xs font-bold">+</button>
+                            <span class="text-xs font-bold">${item.quantity}</span>
+                            <button onclick="changeQty(${item.id}, -1)" class="bg-slate-100 px-2 py-1 rounded text-xs font-bold">-</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('cart-total').innerText = formatCurrency(total);
+        }
+
+        function changeQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(i => i.id !== id);
+                }
+                updateCartCount();
+                renderCart();
+            }
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('سلة المشتريات فارغة!');
+                return;
+            }
+
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
+
+            if (!name || !phone || !address) {
+                alert('يرجى ملء جميع بيانات الاستلام والتوصيل (الاسم، الهاتف، العنوان).');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            const newOrder = {
+                id: Date.now().toString().slice(-5),
+                customerName: name,
+                customerPhone: phone,
+                customerAddress: address,
+                items: [...cart],
+                total: total,
+                date: new Date().toLocaleDateString('ar-YE') + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            orders.push(newOrder);
+            saveOrders();
+
+            // تجهيز رسالة الواتساب
+            let msg = `*طلب جديد من متجر ترند شوب*%0A`;
+            msg += `رقم الطلب: #${newOrder.id}%0A`;
+            msg += `الاسم: ${name}%0A`;
+            msg += `الهاتف: ${phone}%0A`;
+            msg += `العنوان: ${address}%0A%0A`;
+            msg += `*المنتجات:*%0A`;
+            cart.forEach(i => {
+                msg += `- ${i.name} (العدد: ${i.quantity}) - ${formatCurrency(i.price * i.quantity)}%0A`;
+            });
+            msg += `%0A*المجموع الكلي:* ${formatCurrency(total)}`;
+
+            cart = [];
+            updateCartCount();
+            toggleCart();
+
+            window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, '_blank');
+        }
+
+        // تشغيل أولي عند تحميل الصفحة
+        renderProducts();
+        updateCartCount();
+    </script>
 </body>
 </html>
